@@ -1,0 +1,6 @@
+.vscode/
+Butter.Backend/
+Butter.Web/.tscache/
+Butter.Web/build/
+Butter.Web/node_modules/
+Butter.Web/dist/

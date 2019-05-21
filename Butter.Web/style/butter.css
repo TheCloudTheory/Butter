@@ -1,0 +1,19 @@
+.welcome .menu {
+    display: none;
+}
+
+.welcome .menu.active {
+    display: block;
+}
+
+#versionSelector .dropdown {
+    display: block;
+}
+
+#getContentButton {
+    display: none;
+}
+
+#getContentButton.active {
+    display: block;
+}
