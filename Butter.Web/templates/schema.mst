@@ -1,0 +1,13 @@
+<div class="panel">
+    <div class="panel-header text-center">
+        <figure class="avatar avatar-lg"><img src="../img/avatar-2.png" alt="Avatar"></figure>
+        <div class="panel-title h5 mt-10">{{schema.title}}</div>
+        <div class="panel-subtitle">{{schema.description}}</div>
+    </div>
+  <div class="panel-nav">
+  </div>
+  <div class="panel-body">
+  </div>
+  <div class="panel-footer">
+  </div>
+</div>

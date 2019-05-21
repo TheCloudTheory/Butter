@@ -17,3 +17,15 @@
 #getContentButton.active {
     display: block;
 }
+
+.butter-wrapper {
+    min-height: 100vh;
+}
+
+.overflow-x-disabled {
+    overflow-x: hidden;
+}
+
+.welcome .columns {
+    margin-top: .5em;
+}

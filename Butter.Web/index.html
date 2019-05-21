@@ -23,18 +23,23 @@
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->
 
-  <!-- Add your site or application content here -->
-  <div class="container">
-    <div class="columns">
-      <div class="column col-4 col-mx-auto text-center">
-        <div class="container">
-          <div class="columns" id="content">
+  <div class="off-canvas off-canvas-sidebar-show butter-wrapper">
+    <a class="off-canvas-toggle btn btn-primary btn-action" href="#sidebar-id">
+      <i class="icon icon-menu"></i>
+    </a>
 
-          </div>
-        </div>
+    <div id="sidebar-id" class="off-canvas-sidebar overflow-x-disabled">
+      <div class="columns" id="sidebar">
+
       </div>
     </div>
 
-    <script src="dist/app.js"></script>
+    <a class="off-canvas-overlay" href="#close"></a>
+
+    <div class="off-canvas-content" id="content">
+    </div>
+  </div>
+
+  <script src="dist/app.js"></script>
 
 </html>

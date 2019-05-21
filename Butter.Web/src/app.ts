@@ -1,14 +1,15 @@
 import http from './http';
 import templates from './templates';
+import { ResourceSchema } from './resourceSchema';
 
 class butter {
-    content: HTMLElement | null;
+    sidebar: HTMLElement | null;
     map: {[id: string] : Array<string>};
     selectedServiceId: string;
     selectedVersion: string;
 
     constructor() {
-        this.content = document.getElementById('content');
+        this.sidebar = document.getElementById('sidebar');
         this.map = {};
         this.selectedServiceId = '';
         this.selectedVersion = '';
@@ -17,7 +18,7 @@ class butter {
     initialize(): void {
         http.get<{[id: string] : Array<string>}>('GetMap').then(_ => {
             this.map = _;
-            templates.renderTemplate('welcome', this.content as HTMLElement, { }).then(() => {
+            templates.renderTemplate('welcome', this.sidebar as HTMLElement, { }).then(() => {
                 this.registerSearchBoxEventListener();
             });
         });
@@ -73,8 +74,8 @@ class butter {
     private renderGetTemplateButton(): void {
         let buttonElement = document.getElementById('getContentButton') as HTMLElement;
         buttonElement.addEventListener('click', () => {
-            http.get<Object>(`GetContent/${this.selectedServiceId}/${this.selectedVersion}`).then((_) => {
-                console.log(_); 
+            http.get<ResourceSchema>(`GetContent/${this.selectedServiceId}/${this.selectedVersion}`).then((_) => {
+                this.renderJsonSchema(_);        
             });
         });
 
@@ -89,6 +90,11 @@ class butter {
         }
 
         suggestionsBox.classList.add('active');
+    }
+
+    private renderJsonSchema(schema: ResourceSchema): void {
+        let schemaElement = document.getElementById('content') as HTMLElement;
+        templates.renderTemplate('schema', schemaElement, { schema });
     }
 }
 
