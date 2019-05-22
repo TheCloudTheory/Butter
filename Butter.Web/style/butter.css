@@ -29,3 +29,16 @@
 .welcome .columns {
     margin-top: .5em;
 }
+
+.inside-panel {
+    margin-bottom: .5em;
+    padding: .5em;
+}
+
+.inside-panel .accordion .accordion-body {
+    margin-bottom: 0;
+}
+
+.inside-panel .accordion .accordion-header {
+    cursor: pointer;
+}

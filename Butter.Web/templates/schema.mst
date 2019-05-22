@@ -1,12 +1,39 @@
 <div class="panel">
     <div class="panel-header text-center">
-        <figure class="avatar avatar-lg"><img src="../img/avatar-2.png" alt="Avatar"></figure>
+        <figure class="avatar avatar-lg" data-initial="T"></figure>
         <div class="panel-title h5 mt-10">{{schema.title}}</div>
         <div class="panel-subtitle">{{schema.description}}</div>
     </div>
   <div class="panel-nav">
   </div>
   <div class="panel-body">
+    <div class="form-group">
+        <label class="form-label">Id</label>
+        <input class="form-input" type="text" value="{{schema.id}}" disabled>
+    </div>
+      <div class="form-group">
+        <label class="form-label">Schema</label>
+        <input class="form-input" type="text" value="{{schema.$schema}}" disabled>
+    </div>
+    {{#resources}}
+    <div class="panel inside-panel">
+        <div class="accordion">
+            <input type="checkbox" id="accordion-{{description}}" name="accordion-checkbox" hidden>
+            <label class="accordion-header" for="accordion-{{description}}">
+                <i class="icon icon-arrow-right mr-1"></i>
+                {{description}}
+            </label>
+            <div class="accordion-body">
+            {{#mappedProperties}}
+                <div class="form-group">
+                    <label class="form-label">{{name}}</label>
+                    <input class="form-input" type="text" value="">
+                </div>
+            {{/mappedProperties}}
+            </div>
+        </div>
+    </div>
+    {{/resources}}
   </div>
   <div class="panel-footer">
   </div>
