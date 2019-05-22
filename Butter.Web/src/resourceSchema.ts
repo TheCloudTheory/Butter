@@ -20,5 +20,11 @@ export type ResourceDefinition = {
     description: string;
     required: Array<string>;
     properties: { [index: string]: Object };
-    mappedProperties: Array<Object>
+    mappedProperties: Array<Resource>
+}
+
+export type Resource = {
+    name: string;
+    properties: Object;
+    isRequired: boolean;
 }

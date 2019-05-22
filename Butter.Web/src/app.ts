@@ -1,6 +1,6 @@
 import http from './http';
 import templates from './templates';
-import { ResourceSchema } from './resourceSchema';
+import { ResourceSchema, Resource } from './resourceSchema';
 
 class butter {
     sidebar: HTMLElement | null;
@@ -31,6 +31,9 @@ class butter {
         let input = document.getElementById('optionalFieldsToggle') as HTMLInputElement;
         input.addEventListener('change', () => {
             this.optionalFieldsEnabled = !this.optionalFieldsEnabled;
+            if (this.selectedServiceId !== '' && this.selectedVersion !== '') {
+                this.renderJsonSchemaTemplate();
+            }
         });
     }
 
@@ -84,12 +87,16 @@ class butter {
     private renderGetTemplateButton(): void {
         let buttonElement = document.getElementById('getContentButton') as HTMLElement;
         buttonElement.addEventListener('click', () => {
-            http.get<ResourceSchema>(`GetContent/${this.selectedServiceId}/${this.selectedVersion}`).then((_) => {
-                this.renderJsonSchema(_);
-            });
+            this.renderJsonSchemaTemplate();
         });
 
         this.alterActive('getContentButton');
+    }
+
+    private renderJsonSchemaTemplate(): void {
+        http.get<ResourceSchema>(`GetContent/${this.selectedServiceId}/${this.selectedVersion}`).then((_) => {
+            this.renderJsonSchema(_);
+        });
     }
 
     private alterActive(elementId: string): void {
@@ -106,12 +113,20 @@ class butter {
         let schemaElement = document.getElementById('content') as HTMLElement;
         let resources: Array<Object> = [];
         for (let resource in schema.resourceDefinitions) {
-            let properties: Array<Object> = [];
+            let properties: Array<Resource> = [];
+            let processedResource = schema.resourceDefinitions[resource];
+
             for (let property in schema.resourceDefinitions[resource].properties) {
-                properties.push({ name: property, properties: schema.resourceDefinitions[resource].properties[property] });
+                let isRequired = processedResource.required.includes(property);
+                if (this.optionalFieldsEnabled === true || isRequired === true) {
+                    properties.push({
+                        name: property,
+                        properties: schema.resourceDefinitions[resource].properties[property],
+                        isRequired: isRequired
+                    });
+                }
             }
 
-            let processedResource = schema.resourceDefinitions[resource];
             processedResource.mappedProperties = properties;
             resources.push(processedResource);
         }
