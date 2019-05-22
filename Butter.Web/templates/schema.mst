@@ -1,44 +1,23 @@
 <div class="panel">
     <div class="panel-header text-center">
         <figure class="avatar avatar-lg" data-initial="T"></figure>
-        <div class="panel-title h5 mt-10">{{schema.title}}</div>
-        <div class="panel-subtitle">{{schema.description}}</div>
+        <div class="panel-title h5 mt-10">{{name}}</div>
+        <div class="panel-subtitle">{{description}}</div>
     </div>
   <div class="panel-nav">
   </div>
   <div class="panel-body">
-    <div class="form-group">
-        <label class="form-label">Id</label>
-        <input class="form-input" type="text" value="{{schema.id}}" disabled>
-    </div>
-      <div class="form-group">
-        <label class="form-label">Schema</label>
-        <input class="form-input" type="text" value="{{schema.$schema}}" disabled>
-    </div>
-    {{#resources}}
-    <div class="panel inside-panel">
-        <div class="accordion">
-            <input type="checkbox" id="accordion-{{description}}" name="accordion-checkbox" hidden>
-            <label class="accordion-header" for="accordion-{{description}}">
-                <i class="icon icon-arrow-right mr-1"></i>
-                {{description}}
-            </label>
-            <div class="accordion-body">
-            {{#mappedProperties}}
-                <div class="form-group">
-                    <label class="form-label">{{name}}</label>
-                    {{#properties.enum}}
-                        <input class="form-input" type="text" value="{{properties.enum}}" disabled>
-                    {{/properties.enum}}
-                    {{^properties.enum}}
-                        <input class="form-input" type="text" value="" placeholder="{{properties.description}}">
-                    {{/properties.enum}}
-                </div>
-            {{/mappedProperties}}
+    {{#properties}}
+            <div class="form-group">
+                <label class="form-label">{{name}}</label>
+                {{#properties.enum}}
+                    <input class="form-input" type="text" value="{{properties.enum}}" disabled>
+                {{/properties.enum}}
+                {{^properties.enum}}
+                    <input class="form-input" type="text" value="" placeholder="{{properties.description}}">
+                {{/properties.enum}}
             </div>
-        </div>
-    </div>
-    {{/resources}}
+        {{/properties}}
   </div>
   <div class="panel-footer">
   </div>

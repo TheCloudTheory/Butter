@@ -6,7 +6,9 @@ class butter {
     sidebar: HTMLElement | null;
     map: { [id: string]: Array<string> };
     selectedServiceId: string;
+    selectedService: ResourceSchema | null;
     selectedVersion: string;
+    selectedResource: string;
     optionalFieldsEnabled: boolean;
 
     constructor() {
@@ -14,6 +16,8 @@ class butter {
         this.map = {};
         this.selectedServiceId = '';
         this.selectedVersion = '';
+        this.selectedResource = '';
+        this.selectedService = null;
         this.optionalFieldsEnabled = false;
     }
 
@@ -78,9 +82,32 @@ class butter {
                 versionItems[i].addEventListener('click', (e) => {
                     let version = (<HTMLElement>e.target).innerText;
                     this.selectedVersion = version;
-                    this.renderGetTemplateButton();
+                    this.renderResourceSelector();
                 });
             }
+        });
+    }
+
+    private renderResourceSelector(): void {
+        let resourceSelectorElement = document.getElementById('resourceSelector') as HTMLElement;
+        http.get<ResourceSchema>(`GetContent/${this.selectedServiceId}/${this.selectedVersion}`).then((_) => {
+            this.selectedService = _;
+            let resources: Array<Object> = [];
+            for (let resource in _.resourceDefinitions) {
+                let processedResource = _.resourceDefinitions[resource];
+                resources.push(processedResource);
+            }
+
+            templates.renderTemplate('resourceSelector', resourceSelectorElement, { resources }).then(() => {
+                let resourceItems = document.getElementsByClassName('resource-item');
+                for (let i = 0; i < resourceItems.length; i++) {
+                    resourceItems[i].addEventListener('click', (e) => {
+                        let resource = (<HTMLElement>e.target).innerText;
+                        this.selectedResource = resource.split('/')[1];
+                        this.renderGetTemplateButton();
+                    });
+                }
+            });
         });
     }
 
@@ -94,9 +121,7 @@ class butter {
     }
 
     private renderJsonSchemaTemplate(): void {
-        http.get<ResourceSchema>(`GetContent/${this.selectedServiceId}/${this.selectedVersion}`).then((_) => {
-            this.renderJsonSchema(_);
-        });
+        this.renderJsonSchema();
     }
 
     private alterActive(elementId: string): void {
@@ -109,34 +134,31 @@ class butter {
         suggestionsBox.classList.add('active');
     }
 
-    private renderJsonSchema(schema: ResourceSchema): void {
+    private renderJsonSchema(): void {
         let schemaElement = document.getElementById('content') as HTMLElement;
-        let resources: Array<Object> = [];
-        for (let resource in schema.resourceDefinitions) {
-            let properties: Array<Resource> = [];
-            let processedResource = schema.resourceDefinitions[resource];
+        let schema = this.selectedService as ResourceSchema;
+        let selectedResource = schema.resourceDefinitions[this.selectedResource];
+        let properties: Array<Resource> = [];
 
-            for (let property in schema.resourceDefinitions[resource].properties) {
-                let isRequired = processedResource.required.includes(property);
-                if (this.optionalFieldsEnabled === true || isRequired === true) {
-                    properties.push({
-                        name: property,
-                        properties: schema.resourceDefinitions[resource].properties[property],
-                        isRequired: isRequired
-                    });
-                }
+        for (let property in selectedResource.properties) {
+            let isRequired = selectedResource.required.includes(property);
+            if (this.optionalFieldsEnabled === true || isRequired === true) {
+                properties.push({
+                    name: property,
+                    properties: selectedResource.properties[property],
+                    isRequired: isRequired
+                });
             }
-
-            processedResource.mappedProperties = properties;
-            resources.push(processedResource);
         }
 
         templates.renderTemplate('schema', schemaElement, {
-            schema, resources
+            name: this.selectedResource,
+            description: `${this.selectedServiceId}(${this.selectedVersion})`,
+            properties
         });
 
         console.log(schema);
-        console.log(resources);
+        console.log(properties);
     }
 }
 

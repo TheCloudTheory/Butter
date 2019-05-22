@@ -23,6 +23,11 @@
      </div>
      <div class="columns">
         <div class="column">
+            <div id="resourceSelector"></div>
+        </div>
+     </div>
+     <div class="columns">
+        <div class="column">
             <button class="btn btn-success btn-block" id="getContentButton">Load schema</button>
         </div>
      </div>
