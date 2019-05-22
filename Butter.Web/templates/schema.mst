@@ -27,7 +27,12 @@
             {{#mappedProperties}}
                 <div class="form-group">
                     <label class="form-label">{{name}}</label>
-                    <input class="form-input" type="text" value="">
+                    {{#properties.enum}}
+                        <input class="form-input" type="text" value="{{properties.enum}}" disabled>
+                    {{/properties.enum}}
+                    {{^properties.enum}}
+                        <input class="form-input" type="text" value="" placeholder="{{properties.description}}">
+                    {{/properties.enum}}
                 </div>
             {{/mappedProperties}}
             </div>

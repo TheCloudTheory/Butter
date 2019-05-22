@@ -26,6 +26,16 @@
             <button class="btn btn-success btn-block" id="getContentButton">Load schema</button>
         </div>
      </div>
+     <div class="columns">
+        <div class="column">
+            <div class="form-group">
+            <label class="form-switch text-left">
+                <input type="checkbox" id="optionalFieldsToggle">
+                <i class="form-icon"></i> Enable optional fields
+            </label>
+            </div>
+        </div>
+     </div>
     </div>
 </div>
 </div>

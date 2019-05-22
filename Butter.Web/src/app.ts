@@ -7,12 +7,14 @@ class butter {
     map: { [id: string]: Array<string> };
     selectedServiceId: string;
     selectedVersion: string;
+    optionalFieldsEnabled: boolean;
 
     constructor() {
         this.sidebar = document.getElementById('sidebar');
         this.map = {};
         this.selectedServiceId = '';
         this.selectedVersion = '';
+        this.optionalFieldsEnabled = false;
     }
 
     initialize(): void {
@@ -20,7 +22,15 @@ class butter {
             this.map = _;
             templates.renderTemplate('welcome', this.sidebar as HTMLElement, {}).then(() => {
                 this.registerSearchBoxEventListener();
+                this.registerOptionalFieldsListener();
             });
+        });
+    }
+
+    private registerOptionalFieldsListener(): void {
+        let input = document.getElementById('optionalFieldsToggle') as HTMLInputElement;
+        input.addEventListener('change', () => {
+            this.optionalFieldsEnabled = !this.optionalFieldsEnabled;
         });
     }
 
@@ -106,14 +116,12 @@ class butter {
             resources.push(processedResource);
         }
 
-        console.log(resources);
         templates.renderTemplate('schema', schemaElement, {
-            schema, resources, generateField: () => {
-                return (field: string, render: Function) => {
-                    return render(field);
-                }
-            }
+            schema, resources
         });
+
+        console.log(schema);
+        console.log(resources);
     }
 }
 
