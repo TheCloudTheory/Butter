@@ -1,24 +1,34 @@
-<div class="panel">
-    <div class="panel-header text-center">
-        <figure class="avatar avatar-lg" data-initial="T"></figure>
-        <div class="panel-title h5 mt-10">{{name}}</div>
-        <div class="panel-subtitle">{{description}}</div>
+<div class="container generate">
+    <div class="columns">
+        <div class="column">
+            <div class="panel">
+                <div class="panel-header text-center">
+                    <figure class="avatar avatar-lg" data-initial="T"></figure>
+                    <div class="panel-title h5 mt-10">{{name}}</div>
+                    <div class="panel-subtitle">{{description}}</div>
+                </div>
+                <div class="panel-body">
+                    <form id="jsonSchema">
+                        {{#properties}}
+                            <div class="form-group">
+                                <label class="form-label">{{name}}</label>
+                                {{#properties.enum}}
+                                    <input class="form-input schema-field" type="text" value="{{properties.enum}}" readonly name="{{name}}">
+                                {{/properties.enum}}
+                                {{^properties.enum}}
+                                    <input class="form-input schema-field" type="text" value="" placeholder="{{properties.description}}" name="{{name}}">
+                                {{/properties.enum}}
+                            </div>
+                        {{/properties}}
+                    </form>
+                </div>
+                <div class="panel-footer"></div>
+            </div>      
+        </div>
+        <div class="column">
+            <div class="panel">
+                <div class="panel-body" id="generatedJson">
+            </div>      
+        </div>
     </div>
-  <div class="panel-nav">
-  </div>
-  <div class="panel-body">
-    {{#properties}}
-            <div class="form-group">
-                <label class="form-label">{{name}}</label>
-                {{#properties.enum}}
-                    <input class="form-input" type="text" value="{{properties.enum}}" disabled>
-                {{/properties.enum}}
-                {{^properties.enum}}
-                    <input class="form-input" type="text" value="" placeholder="{{properties.description}}">
-                {{/properties.enum}}
-            </div>
-        {{/properties}}
-  </div>
-  <div class="panel-footer">
-  </div>
 </div>

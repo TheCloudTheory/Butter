@@ -155,10 +155,36 @@ class butter {
             name: this.selectedResource,
             description: `${this.selectedServiceId}(${this.selectedVersion})`,
             properties
+        }).then(() => {
+            this.addEventListenersToSchemaFields();
+            this.renderGeneratedJson();
         });
 
         console.log(schema);
         console.log(properties);
+    }
+
+    private addEventListenersToSchemaFields(): void {
+        let fields = document.getElementsByClassName('schema-field');
+        for(let i = 0; i < fields.length; i++) {
+            let field = fields[i];
+            field.addEventListener('keyup', () => {
+                this.renderGeneratedJson();
+            });
+        }
+    }
+
+    private renderGeneratedJson(): void {
+        let jsonElement = document.getElementById('generatedJson') as HTMLElement;
+        let formElement = document.getElementById('jsonSchema') as HTMLFormElement;
+        let form = new FormData(formElement);
+        let json: { [index: string]: string } = {};
+
+        form.forEach((value: FormDataEntryValue, key: string, parent: FormData) => {
+            json[key] = value.toString();
+        })
+
+        templates.renderTemplate('json', jsonElement, { json: JSON.stringify(json, null, "\t") });
     }
 }
 
