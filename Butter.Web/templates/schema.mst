@@ -12,12 +12,24 @@
                         {{#properties}}
                             <div class="form-group">
                                 <label class="form-label">{{name}}</label>
-                                {{#properties.enum}}
-                                    <input class="form-input schema-field" type="text" value="{{properties.enum}}" readonly name="{{name}}">
-                                {{/properties.enum}}
-                                {{^properties.enum}}
-                                    <input class="form-input schema-field" type="text" value="" placeholder="{{properties.description}}" name="{{name}}">
-                                {{/properties.enum}}
+                                {{#isEnum}}
+                                    <select class="form-select schema-field" name="{{name}}">
+                                    {{#possibleValues}}
+                                        <option>{{.}}</option>
+                                    {{/possibleValues}}
+                                    </select>                                    
+                                {{/isEnum}}
+                                {{^isEnum}}
+                                    {{#isBoolean}}
+                                        <label class="form-switch">
+                                            <input type="checkbox" name="{{name}}" class="schema-field">
+                                            <i class="form-icon"></i> Enabled
+                                        </label>
+                                    {{/isBoolean}}
+                                    {{^isBoolean}}
+                                        <input class="form-input schema-field" type="text" placeholder="{{description}}" name="{{name}}">
+                                    {{/isBoolean}}
+                                {{/isEnum}}
                             </div>
                         {{/properties}}
                     </form>

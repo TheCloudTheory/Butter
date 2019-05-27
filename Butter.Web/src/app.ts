@@ -1,6 +1,6 @@
 import http from './http';
 import templates from './templates';
-import { ResourceSchema, Resource } from './resourceSchema';
+import { ResourceSchema, Resource, Property, ResourceDefinition, PropertyDescription } from './resourceSchema';
 
 class butter {
     sidebar: HTMLElement | null;
@@ -138,37 +138,91 @@ class butter {
         let schemaElement = document.getElementById('content') as HTMLElement;
         let schema = this.selectedService as ResourceSchema;
         let selectedResource = schema.resourceDefinitions[this.selectedResource];
-        let properties: Array<Resource> = [];
+        let fields = this.flattenFields(selectedResource);
 
-        for (let property in selectedResource.properties) {
-            let isRequired = selectedResource.required.includes(property);
-            if (this.optionalFieldsEnabled === true || isRequired === true) {
-                properties.push({
-                    name: property,
-                    properties: selectedResource.properties[property],
-                    isRequired: isRequired
-                });
-            }
-        }
-
+        console.log(fields);
         templates.renderTemplate('schema', schemaElement, {
             name: this.selectedResource,
             description: `${this.selectedServiceId}(${this.selectedVersion})`,
-            properties
+            properties: fields
         }).then(() => {
             this.addEventListenersToSchemaFields();
             this.renderGeneratedJson();
         });
 
         console.log(schema);
-        console.log(properties);
+    }
+
+    private flattenFields(definition: ResourceDefinition): PropertyDescription[] {
+        let properties: Array<PropertyDescription> = [];
+
+        this.digest(definition.properties, properties);
+        return properties;
+    }
+
+    private digest(properties: { [index: string]: Property }, result: Array<PropertyDescription>, parentProperty?: string): void {
+        let schema = this.selectedService as ResourceSchema;
+        for (let property in properties) {
+            let propertyDefinition = properties[property];
+            let name = parentProperty ? `${parentProperty}.${property}` : property;
+
+            if (propertyDefinition.type) {
+                if (propertyDefinition.enum) {
+                    result.push({
+                        isEnum: true,
+                        name: name,
+                        possibleValues: propertyDefinition.enum
+                    });
+                }
+                else {
+                    result.push({
+                        name: name,
+                        description: propertyDefinition.description
+                    });
+                }
+            }
+
+            if (propertyDefinition.oneOf) {
+                let oneOfDescription = propertyDefinition.oneOf[0];
+                if (oneOfDescription.$ref) {
+                    let additionalDefinitionName = oneOfDescription.$ref.split('/')[2];
+                    let additionalDefinition = schema.definitions[additionalDefinitionName];
+
+                    this.digest(additionalDefinition.properties, result, name);
+                }
+                else if (oneOfDescription.enum) {
+                    result.push({
+                        isEnum: true,
+                        name: name,
+                        possibleValues: oneOfDescription.enum
+                    })
+                }
+                else {
+                    if (oneOfDescription.type) {
+                        if (oneOfDescription.type === 'object') {
+                            result.push({
+                                name: name
+                            });
+                        }
+
+                        if (oneOfDescription.type === 'boolean') {
+                            result.push({
+                                name: name,
+                                isBoolean: true
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     private addEventListenersToSchemaFields(): void {
         let fields = document.getElementsByClassName('schema-field');
-        for(let i = 0; i < fields.length; i++) {
+        for (let i = 0; i < fields.length; i++) {
             let field = fields[i];
-            field.addEventListener('keyup', () => {
+            field.addEventListener('change', () => {
                 this.renderGeneratedJson();
             });
         }
@@ -178,13 +232,49 @@ class butter {
         let jsonElement = document.getElementById('generatedJson') as HTMLElement;
         let formElement = document.getElementById('jsonSchema') as HTMLFormElement;
         let form = new FormData(formElement);
-        let json: { [index: string]: string } = {};
+        let json: { [index: string]: string | Object } = {};
 
         form.forEach((value: FormDataEntryValue, key: string, parent: FormData) => {
-            json[key] = value.toString();
+            let complexKey = key.split('.');
+            if (complexKey.length > 1) {
+                if(typeof(json[complexKey[0]]) === 'undefined') {
+                    json[complexKey[0]] = this.digDeeper(complexKey, 1, {}, value);
+                }
+                else {
+                    (<any>json[complexKey[0]])[complexKey[1]] = this.digDeeper(complexKey, 2, {}, value);
+                }
+            }
+            else {
+                json[key] = value.toString();
+            }
         })
 
         templates.renderTemplate('json', jsonElement, { json: JSON.stringify(json, null, "\t") });
+    }
+
+    private digDeeper(keys: string[], index: number, json: {[index: string] : Object}, value: FormDataEntryValue): Object {
+        let currentKey = keys[index];
+        if(keys.length - 1 > index) {
+            index += 1;
+            if(typeof(json[currentKey]) === 'undefined') {
+                console.log(currentKey, index);
+                json[currentKey] = this.digDeeper(keys, index, {}, value);
+            }
+            else {
+                index += 1;
+                (<any>json[currentKey])[keys[index]] = this.digDeeper(keys, index, {}, value);
+            }
+        }
+        else {
+            if(typeof(currentKey) == 'undefined') {
+                return value.toString();
+            }
+            else {
+                json[currentKey] = value.toString();
+            }
+        }
+
+        return json;
     }
 }
 
