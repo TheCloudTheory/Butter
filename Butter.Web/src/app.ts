@@ -83,9 +83,15 @@ class butter {
                     let version = (<HTMLElement>e.target).innerText;
                     this.selectedVersion = version;
                     this.renderResourceSelector();
+                    this.setSelectedVersion();
                 });
             }
         });
+    }
+
+    private setSelectedVersion(): void {
+        let versionText = document.getElementById('version-selector-text') as HTMLElement;
+        versionText.innerText = this.selectedVersion;
     }
 
     private renderResourceSelector(): void {
@@ -138,13 +144,19 @@ class butter {
         let schemaElement = document.getElementById('content') as HTMLElement;
         let schema = this.selectedService as ResourceSchema;
         let selectedResource = schema.resourceDefinitions[this.selectedResource];
-        let fields = this.flattenFields(selectedResource);
+        let fields = this.flattenFields(selectedResource, selectedResource.required);
+        let outputFields: PropertyDescription[] = [];
 
-        console.log(fields);
+        fields.forEach((value: PropertyDescription, index: Number) => {
+            if(value.isRequired || this.optionalFieldsEnabled) {
+                outputFields.push(value);
+            }
+        });
+
         templates.renderTemplate('schema', schemaElement, {
             name: this.selectedResource,
             description: `${this.selectedServiceId}(${this.selectedVersion})`,
-            properties: fields
+            properties: outputFields
         }).then(() => {
             this.addEventListenersToSchemaFields();
             this.renderGeneratedJson();
@@ -153,31 +165,35 @@ class butter {
         console.log(schema);
     }
 
-    private flattenFields(definition: ResourceDefinition): PropertyDescription[] {
+    private flattenFields(definition: ResourceDefinition, requiredFields: string[]): PropertyDescription[] {
         let properties: Array<PropertyDescription> = [];
 
-        this.digest(definition.properties, properties);
+        this.digest(definition.properties, properties, requiredFields);
         return properties;
     }
 
-    private digest(properties: { [index: string]: Property }, result: Array<PropertyDescription>, parentProperty?: string): void {
+    private digest(properties: { [index: string]: Property }, result: Array<PropertyDescription>, requiredFields: string[], parentProperty?: string): void {
         let schema = this.selectedService as ResourceSchema;
         for (let property in properties) {
             let propertyDefinition = properties[property];
             let name = parentProperty ? `${parentProperty}.${property}` : property;
+            let isRequired = typeof(requiredFields) !== 'undefined' ? requiredFields.includes(property) : false;
+            console.log(isRequired, name);
 
             if (propertyDefinition.type) {
                 if (propertyDefinition.enum) {
                     result.push({
                         isEnum: true,
                         name: name,
-                        possibleValues: propertyDefinition.enum
+                        possibleValues: propertyDefinition.enum,
+                        isRequired
                     });
                 }
                 else {
                     result.push({
                         name: name,
-                        description: propertyDefinition.description
+                        description: propertyDefinition.description,
+                        isRequired
                     });
                 }
             }
@@ -187,35 +203,41 @@ class butter {
                 if (oneOfDescription.$ref) {
                     let additionalDefinitionName = oneOfDescription.$ref.split('/')[2];
                     let additionalDefinition = schema.definitions[additionalDefinitionName];
+                    if(isRequired == false) {
+                        additionalDefinition.required = [];
+                    }
 
-                    this.digest(additionalDefinition.properties, result, name);
+                    this.digest(additionalDefinition.properties, result, additionalDefinition.required, name);
                 }
                 else if (oneOfDescription.enum) {
                     result.push({
                         isEnum: true,
                         name: name,
-                        possibleValues: oneOfDescription.enum
+                        possibleValues: oneOfDescription.enum,
+                        isRequired
                     })
                 }
                 else {
                     if (oneOfDescription.type) {
                         if (oneOfDescription.type === 'object') {
                             result.push({
-                                name: name
+                                name: name,
+                                isObject: true,
+                                isRequired
                             });
                         }
 
                         if (oneOfDescription.type === 'boolean') {
                             result.push({
                                 name: name,
-                                isBoolean: true
+                                isBoolean: true,
+                                isRequired
                             });
                         }
                     }
                 }
             }
         }
-
     }
 
     private addEventListenersToSchemaFields(): void {
@@ -257,7 +279,6 @@ class butter {
         if(keys.length - 1 > index) {
             index += 1;
             if(typeof(json[currentKey]) === 'undefined') {
-                console.log(currentKey, index);
                 json[currentKey] = this.digDeeper(keys, index, {}, value);
             }
             else {

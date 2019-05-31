@@ -37,6 +37,8 @@ export type PropertyDescription = {
     possibleValues?: Array<string>;
     description?: string;
     isBoolean?: boolean;
+    isObject?: boolean;
+    isRequired: boolean;
 }
 
 export type OneOf = {
