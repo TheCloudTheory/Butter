@@ -111,14 +111,21 @@ class butter {
                         let resource = (<HTMLElement>e.target).innerText;
                         this.selectedResource = resource.split('/')[1];
                         this.renderGetTemplateButton();
+                        this.setSelectedResource(resource);
                     });
                 }
             });
         });
     }
 
+    private setSelectedResource(resource: string): void {
+        let resourceText = document.getElementById('resource-selector-text') as HTMLElement;
+        resourceText.innerText = resource;
+    }
+
     private renderGetTemplateButton(): void {
         let buttonElement = document.getElementById('getContentButton') as HTMLElement;
+        buttonElement.removeEventListener('click', () => {});
         buttonElement.addEventListener('click', () => {
             this.renderJsonSchemaTemplate();
         });
