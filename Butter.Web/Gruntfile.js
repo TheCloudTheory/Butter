@@ -55,4 +55,5 @@ module.exports = function (grunt) {
     // Tak registration
     grunt.registerTask('default', ['ts', 'browserify', 'connect', 'watch']);
     grunt.registerTask('reload', ['ts', 'browserify']);
+    grunt.registerTask('build', ['ts', 'browserify']);
 };
