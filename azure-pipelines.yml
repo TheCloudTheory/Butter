@@ -15,3 +15,19 @@ steps:
     npm run build
   displayName: 'npm install and build'
   workingDirectory: 'Butter.Web'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'Butter.Web'
+    Contents: |
+      dist/*.js
+      style/*.css
+      index.html
+    TargetFolder: 'Web'
+    CleanTargetFolder: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'Web'
+    ArtifactName: 'web'
+    publishLocation: 'Container'
