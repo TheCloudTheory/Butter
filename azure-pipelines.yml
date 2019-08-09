@@ -39,7 +39,7 @@ stages:
           publishWebProjects: false
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: 'Butter.Backend/bin/Debug/netcoreapp2.1/publish'
+          PathtoPublish: 'Butter.Backend/bin/Debug/netcoreapp2.1/publish/'
           ArtifactName: 'backend'
           publishLocation: 'Container'
       - task: PublishBuildArtifacts@1
