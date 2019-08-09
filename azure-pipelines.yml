@@ -45,17 +45,17 @@ stages:
   - deployment: DeployArm
     pool:
         vmImage: 'Ubuntu-16.04'
-      environment: 'dev'
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - task: AzureResourceGroupDeployment@2
-              inputs:
-                azureSubscription: 'MVP Sponsorship(58ac7037-efcc-4fb6-800d-da6ca2ee6aed)'
-                action: 'Create Or Update Resource Group'
-                resourceGroupName: 'butter-prod-euw-rg'
-                location: 'West Europe'
-                templateLocation: 'Linked artifact'
-                csmFile: 'deployment/butter.json'
-                deploymentMode: 'Incremental'
+    environment: 'dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureResourceGroupDeployment@2
+            inputs:
+              azureSubscription: 'MVP Sponsorship(58ac7037-efcc-4fb6-800d-da6ca2ee6aed)'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'butter-prod-euw-rg'
+              location: 'West Europe'
+              templateLocation: 'Linked artifact'
+              csmFile: 'deployment/butter.json'
+              deploymentMode: 'Incremental'
