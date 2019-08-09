@@ -37,9 +37,16 @@ stages:
           command: 'publish'
           projects: 'Butter.Backend/Butter.Backend.csproj'
           publishWebProjects: false
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: 'Butter.Backend/bin/Debug/netcoreapp2.1/publish'
+          Contents: |
+            **/*
+          TargetFolder: 'Backend'
+          CleanTargetFolder: true
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: 'Butter.Backend/bin/Debug/netcoreapp2.1/publish/'
+          PathtoPublish: 'Backend'
           ArtifactName: 'backend'
           publishLocation: 'Container'
       - task: PublishBuildArtifacts@1
