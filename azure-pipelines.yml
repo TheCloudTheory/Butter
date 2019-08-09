@@ -34,23 +34,13 @@ stages:
           publishLocation: 'Container'
       - task: DotNetCoreCLI@2
         inputs:
-          command: 'build'
-          projects: 'Butter.Backend/Butter.Backend.csproj'
-      - task: DotNetCoreCLI@2
-        inputs:
           command: 'publish'
           projects: 'Butter.Backend/Butter.Backend.csproj'
           publishWebProjects: false  
-      - task: CopyFiles@2
-        inputs:
-          SourceFolder: 'Butter.Backend/bin/Debug/netcoreapp2.1/publish'
-          Contents: |
-            **/*
-          TargetFolder: 'Backend'
-          CleanTargetFolder: true
+          arguments: '--output $(Build.ArtifactStagingDirectory)/Backend'
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: 'Backend'
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/Backend'
           ArtifactName: 'backend'
           publishLocation: 'Container'
       - task: PublishBuildArtifacts@1
