@@ -58,6 +58,12 @@ stages:
       runOnce:
         deploy:
           steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              downloadPath: '$(System.ArtifactsDirectory)'
+              artifactName: 'deployment'
           - task: AzureResourceGroupDeployment@2
             inputs:
               azureSubscription: 'MVP Sponsorship(58ac7037-efcc-4fb6-800d-da6ca2ee6aed)'
