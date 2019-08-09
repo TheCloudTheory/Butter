@@ -1,38 +1,61 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'ubuntu-latest'
+stages:
+- stage: Build
+  jobs:
+    - job: Build
+      pool:
+        vmImage: 'Ubuntu-16.04'
+      continueOnError: false
+      steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+        displayName: 'Install Node.js'
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
+      - script: |
+          npm install
+          npm run build
+        displayName: 'npm install and build'
+        workingDirectory: 'Butter.Web'
 
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
-  workingDirectory: 'Butter.Web'
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: 'Butter.Web'
+          Contents: |
+            dist/*.js
+            style/*.css
+            index.html
+          TargetFolder: 'Web'
+          CleanTargetFolder: true
 
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: 'Butter.Web'
-    Contents: |
-      dist/*.js
-      style/*.css
-      index.html
-    TargetFolder: 'Web'
-    CleanTargetFolder: true
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'Web'
+          ArtifactName: 'web'
+          publishLocation: 'Container'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: 'Web'
-    ArtifactName: 'web'
-    publishLocation: 'Container'
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: 'Butter.Backend/Butter.Backend.csproj'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: 'Butter.Backend/Butter.Backend.csproj'
+- stage: PublishAzure
+  jobs:
+  - deployment: DeployArm
+    pool:
+        vmImage: 'Ubuntu-16.04'
+      environment: 'dev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: AzureResourceGroupDeployment@2
+              inputs:
+                azureSubscription: 'MVP Sponsorship(58ac7037-efcc-4fb6-800d-da6ca2ee6aed)'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: 'butter-prod-euw-rg'
+                location: 'West Europe'
+                templateLocation: 'Linked artifact'
+                csmFile: 'deployment/butter.json'
+                deploymentMode: 'Incremental'
