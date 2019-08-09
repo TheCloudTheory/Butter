@@ -13,13 +13,11 @@ stages:
         inputs:
           versionSpec: '10.x'
         displayName: 'Install Node.js'
-
       - script: |
           npm install
           npm run build
         displayName: 'npm install and build'
         workingDirectory: 'Butter.Web'
-
       - task: CopyFiles@2
         inputs:
           SourceFolder: 'Butter.Web'
@@ -29,17 +27,25 @@ stages:
             index.html
           TargetFolder: 'Web'
           CleanTargetFolder: true
-
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: 'Web'
           ArtifactName: 'web'
           publishLocation: 'Container'
-
       - task: DotNetCoreCLI@2
         inputs:
-          command: 'build'
+          command: 'publish'
           projects: 'Butter.Backend/Butter.Backend.csproj'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'Butter.Backend/bin/Debug/netcoreapp2.1/publish'
+          ArtifactName: 'backend'
+          publishLocation: 'Container'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'deployment'
+          ArtifactName: 'deployment'
+          publishLocation: 'Container'
 - stage: PublishAzure
   jobs:
   - deployment: DeployArm
@@ -57,5 +63,5 @@ stages:
               resourceGroupName: 'butter-prod-euw-rg'
               location: 'West Europe'
               templateLocation: 'Linked artifact'
-              csmFile: 'deployment/butter.json'
+              csmFile: '$(Pipeline.Workspace)/deployment/butter.json'
               deploymentMode: 'Incremental'
