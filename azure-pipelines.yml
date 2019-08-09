@@ -31,3 +31,8 @@ steps:
     PathtoPublish: 'Web'
     ArtifactName: 'web'
     publishLocation: 'Container'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: 'Butter.Backend/Butter.Backend.csproj'
