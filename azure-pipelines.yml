@@ -42,7 +42,7 @@ stages:
           zipAfterPublish: false
       - task: ArchiveFiles@2
         inputs:
-          rootFolderOrFile: "$(System.ArtifactStagingDirectory)/Backend"
+          rootFolderOrFile: "$(Build.ArtifactStagingDirectory)/Backend"
           includeRootFolder: false
           archiveFile: "$(System.ArtifactStagingDirectory)/build$(Build.BuildId).zip"
       - task: PublishPipelineArtifact@1
@@ -51,7 +51,7 @@ stages:
           artifact: 'deployment'
       - task: PublishPipelineArtifact@1
         inputs:
-          targetPath: '$(System.ArtifactStagingDirectory)/build$(Build.BuildId).zip'
+          targetPath: '$(Build.ArtifactStagingDirectory)/build$(Build.BuildId).zip'
           artifact: 'backend'
 - stage: PublishAzure
   jobs:
