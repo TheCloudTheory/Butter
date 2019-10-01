@@ -4,6 +4,7 @@
   "description": "ARM composer & builder",
   "main": "index.js",
   "scripts": {
+    "start": "grunt",
     "build": "grunt build"
   },
   "keywords": [
