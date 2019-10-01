@@ -83,4 +83,4 @@ stages:
               WebAppName: 'butter-prod-euw-functionapp'
               packageForLinux: '$(Pipeline.Workspace)/backend'
               enableCustomDeployment: true
-              DeploymentType: 'zipDeploy'
+              DeploymentType: 'runFromZip'
