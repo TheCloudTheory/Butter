@@ -27,27 +27,24 @@ stages:
             index.html
           TargetFolder: 'Web'
           CleanTargetFolder: true
-      - task: PublishBuildArtifacts@1
+      - task: PublishPipelineArtifact@1
         inputs:
-          PathtoPublish: 'Web'
-          ArtifactName: 'web'
-          publishLocation: 'Container'
+          targetPath: 'Web'
+          artifact: 'web'
       - task: DotNetCoreCLI@2
         inputs:
           command: 'publish'
           projects: 'Butter.Backend/Butter.Backend.csproj'
           publishWebProjects: false  
           arguments: '--output $(Build.ArtifactStagingDirectory)/Backend'
-      - task: PublishBuildArtifacts@1
+      - task: PublishPipelineArtifact@1
         inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)/Backend'
-          ArtifactName: 'backend'
-          publishLocation: 'Container'
-      - task: PublishBuildArtifacts@1
+          targetPath: 'deployment'
+          artifact: 'deployment'
+      - task: PublishPipelineArtifact@1
         inputs:
-          PathtoPublish: 'deployment'
-          ArtifactName: 'deployment'
-          publishLocation: 'Container'
+          targetPath: '$(Build.ArtifactStagingDirectory)/Backend'
+          artifact: 'backend'
 - stage: PublishAzure
   jobs:
   - deployment: DeployArm
@@ -58,12 +55,11 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: DownloadBuildArtifacts@0
+          - task: DownloadPipelineArtifact@2
             inputs:
               buildType: 'current'
-              downloadType: 'single'
-              downloadPath: '$(System.ArtifactsDirectory)'
               artifactName: 'deployment'
+              targetPath: '$(Pipeline.Workspace)'
           - task: AzureResourceGroupDeployment@2
             inputs:
               azureSubscription: 'MVP Sponsorship(58ac7037-efcc-4fb6-800d-da6ca2ee6aed)'
