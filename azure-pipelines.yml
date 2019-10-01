@@ -60,6 +60,11 @@ stages:
               buildType: 'current'
               artifactName: 'deployment'
               targetPath: '$(Pipeline.Workspace)'
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: 'current'
+              artifactName: 'backend'
+              targetPath: '$(Pipeline.Workspace)'
           - task: AzureResourceGroupDeployment@2
             inputs:
               azureSubscription: 'MVP Sponsorship(58ac7037-efcc-4fb6-800d-da6ca2ee6aed)'
@@ -70,3 +75,10 @@ stages:
               csmParametersFile: '$(Pipeline.Workspace)/deployment/butter.parameters.json'
               csmFile: '$(Pipeline.Workspace)/deployment/butter.json'
               deploymentMode: 'Incremental'
+          - task: AzureRmWebAppDeployment@4
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'MVP Sponsorship(58ac7037-efcc-4fb6-800d-da6ca2ee6aed)'
+              appType: 'webApp'
+              WebAppName: 'butter-prod-euw-functionapp'
+              packageForLinux: '$(Pipeline.Workspace)/backend'
