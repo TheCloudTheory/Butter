@@ -59,10 +59,6 @@
                             "value": "~2"
                         },
                         {
-                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                            "value": "8.11.1"
-                        },
-                        {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
                             "value": "dotnet"
                         }
