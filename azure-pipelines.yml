@@ -70,3 +70,10 @@ stages:
               csmParametersFile: '$(Pipeline.Workspace)/deployment/butter.parameters.json'
               csmFile: '$(Pipeline.Workspace)/deployment/butter.json'
               deploymentMode: 'Incremental'
+          - task: AzureRmWebAppDeployment@4
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'MVP Sponsorship(58ac7037-efcc-4fb6-800d-da6ca2ee6aed)'
+              appType: 'webApp'
+              WebAppName: 'butter-prod-euw-functionapp'
+              packageForLinux: '$(Pipeline.Workspace)/Backend/Butter.Backend'
