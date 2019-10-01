@@ -67,5 +67,6 @@ stages:
               resourceGroupName: 'butter-prod-euw-rg'
               location: 'West Europe'
               templateLocation: 'Linked artifact'
+              csmParametersFile: '$(Pipeline.Workspace)/deployment/butter.parameters.json'
               csmFile: '$(Pipeline.Workspace)/deployment/butter.json'
               deploymentMode: 'Incremental'
