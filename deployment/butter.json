@@ -17,21 +17,17 @@
     },
     "resources": [
         {
-            "name": "[parameters('functionAppServiceName')]",
             "type": "Microsoft.Web/serverfarms",
-            "location": "[resourceGroup().location]",
             "apiVersion": "2018-02-01",
-            "dependsOn": [
-            ],
-            "tags": {
-                "displayName": "appservice"
+            "name": "[parameters('functionAppServiceName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic"
             },
             "properties": {
                 "name": "[parameters('functionAppServiceName')]",
-                "computeMode": "Dynamic",
-                "sku": "Dynamic",
-                "workerSize": "0",
-                "numberOfWorkers": 1
+                "computeMode": "Dynamic"
             }
         },
         {
@@ -44,33 +40,38 @@
                 "displayName": "functionapp"
             },
             "properties": {
-                "name": "[parameters('functionAppName')]",
-                "hostNames": [
-                    "[concat(parameters('functionAppName'),'.azurewebsites.net')]"
-                ],
-                "cors": {
-                    "allowedOrigins": [
-                        "[concat('https://', parameters('functionAppName'), '.azurewebsites.net')]"
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('functionStorageName'), ';AccountKey=', listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('functionStorageName'), ';AccountKey=', listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('functionStorageName'), ';AccountKey=', listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(parameters('functionAppName'))]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                            "value": "8.11.1"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "dotnet"
+                        }
                     ]
                 },
-                "enabledHostNames": [
-                    "[concat(parameters('functionAppName'), '.azurewebsites.net')]",
-                    "[concat(parameters('functionAppName'), '.scm.azurewebsites.net')]"
-                ],
-                "hostNameSslStates": [
-                    {
-                        "name": "[concat(parameters('functionAppName'),'.azurewebsites.net')]",
-                        "sslState": 0,
-                        "thumbprint": null,
-                        "ipBasedSslState": 0
-                    },
-                    {
-                        "name": "[concat(parameters('functionAppName'),'.scm.azurewebsites.net')]",
-                        "sslState": 0,
-                        "thumbprint": null,
-                        "ipBasedSslState": 0
-                    }
-                ],
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('functionAppServiceName'))]"
             },
             "resources": [
