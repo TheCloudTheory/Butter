@@ -44,7 +44,7 @@ stages:
         inputs:
           rootFolderOrFile: "$(Build.ArtifactStagingDirectory)/Backend"
           includeRootFolder: false
-          archiveFile: "$(System.ArtifactStagingDirectory)/build$(Build.BuildId).zip"
+          archiveFile: "$(Build.ArtifactStagingDirectory)/build$(Build.BuildId).zip"
       - task: PublishPipelineArtifact@1
         inputs:
           targetPath: 'deployment'
