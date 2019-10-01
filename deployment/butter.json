@@ -13,7 +13,7 @@
         }
     },
     "variables": {
-        "functionStorageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', parameters('functionStorageName'))]",
+        "functionStorageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', parameters('functionStorageName'))]"
     },
     "resources": [
         {
@@ -50,7 +50,7 @@
                 ],
                 "cors": {
                     "allowedOrigins": [
-                        "[concat('https://', parameters('functionAppName'), '.azurewebsites.net')]",
+                        "[concat('https://', parameters('functionAppName'), '.azurewebsites.net')]"
                     ]
                 },
                 "enabledHostNames": [
@@ -85,13 +85,13 @@
                         "displayName": "functionappsettings"
                     },
                     "properties": {
-                        "AzureWebJobsStorage": "[Concat('DefaultEndpointsProtocol=https;AccountName=',parameters('functionStorageName'),';AccountKey=',listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]",
+                        "AzureWebJobsStorage": "[Concat('DefaultEndpointsProtocol=https;AccountName=',parameters('functionStorageName'),';AccountKey=',listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]"
                     }
                 }
             ],
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', parameters('functionAppServiceName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageName'))]"
             ]
         },
         {
