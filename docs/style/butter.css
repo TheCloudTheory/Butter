@@ -1,0 +1,48 @@
+.welcome .menu {
+    display: none;
+}
+
+.welcome .menu.active {
+    display: block;
+}
+
+#versionSelector .dropdown, #resourceSelector .dropdown {
+    display: block;
+}
+
+#getContentButton {
+    display: none;
+}
+
+#getContentButton.active {
+    display: block;
+}
+
+.butter-wrapper {
+    min-height: 100vh;
+}
+
+.overflow-x-disabled {
+    overflow-x: hidden;
+}
+
+.welcome .columns {
+    margin-top: .5em;
+}
+
+.inside-panel {
+    margin-bottom: .5em;
+    padding: .5em;
+}
+
+.inside-panel .accordion .accordion-body {
+    margin-bottom: 0;
+}
+
+.inside-panel .accordion .accordion-header {
+    cursor: pointer;
+}
+
+.off-canvas .off-canvas-content {
+    padding-left: 1rem;
+}
