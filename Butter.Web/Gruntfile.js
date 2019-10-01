@@ -39,9 +39,38 @@ module.exports = function (grunt) {
             }
         },
         ts: {
-            default : {
+            default: {
                 tsconfig: './tsconfig.json',
                 src: ['src/*.ts', '!node_modules/**/*.ts']
+            }
+        },
+        env: {
+            local: {
+                GET_CONTENT_URL: 'http://localhost:7071/api/GetContent',
+                GET_MAP_URL: 'http://localhost:7071/api/GetMap'
+            },
+            prod: {
+                GET_CONTENT_URL: 'https://butter-prod-euw-functionapp.azurewebsites.net/api/GetContent',
+                GET_MAP_URL: 'https://butter-prod-euw-functionapp.azurewebsites.net/api/GetMap'
+            }
+        },
+        replace: {
+            dist: {
+                options: {
+                    patterns: [
+                        {
+                            match: 'GET_CONTENT_URL',
+                            replacement: '<%= process.env.GET_CONTENT_URL %>'
+                        },
+                        {
+                            match: 'GET_MAP_URL',
+                            replacement: '<%= process.env.GET_MAP_URL %>'
+                        }
+                    ]
+                },
+                files: [
+                    { expand: true, flatten: false, src: ['build/config.js'], dest: '' }
+                ]
             }
         }
     });
@@ -51,9 +80,13 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks("grunt-ts");
+    grunt.loadNpmTasks('grunt-env');
+    grunt.loadNpmTasks('grunt-replace');
 
     // Tak registration
-    grunt.registerTask('default', ['ts', 'browserify', 'connect', 'watch']);
-    grunt.registerTask('reload', ['ts', 'browserify']);
-    grunt.registerTask('build', ['ts', 'browserify']);
+    grunt.registerTask('default', ['env:local', 'default-env']);
+    grunt.registerTask('default-env', ['ts', 'replace', 'browserify', 'connect', 'watch']);
+    grunt.registerTask('reload', ['ts', 'replace', 'browserify']);
+    grunt.registerTask('build', ['env:prod', 'build-env']);
+    grunt.registerTask('build-env', ['ts', 'replace', 'browserify']);
 };

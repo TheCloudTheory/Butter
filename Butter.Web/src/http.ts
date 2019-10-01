@@ -1,8 +1,6 @@
 export default class http {
-    private static baseUrl: string = "http://localhost:7071/api/";
-
     static get<T>(url: string): Promise<T> {
-        return this.getRequest(`${this.baseUrl}${url}`, true);
+        return this.getRequest(`${url}`, true);
     }
 
     static getLocal(file: string): Promise<string> {

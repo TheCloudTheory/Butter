@@ -1,6 +1,7 @@
 import http from './http';
 import templates from './templates';
-import { ResourceSchema, Resource, Property, ResourceDefinition, PropertyDescription } from './resourceSchema';
+import { ResourceSchema, Property, ResourceDefinition, PropertyDescription } from './resourceSchema';
+import config from './config';
 
 class butter {
     sidebar: HTMLElement | null;
@@ -22,7 +23,7 @@ class butter {
     }
 
     initialize(): void {
-        http.get<{ [id: string]: Array<string> }>('GetMap').then(_ => {
+        http.get<{ [id: string]: Array<string> }>(config.GetMapUrl).then(_ => {
             this.map = _;
             templates.renderTemplate('welcome', this.sidebar as HTMLElement, {}).then(() => {
                 this.registerSearchBoxEventListener();
@@ -96,7 +97,7 @@ class butter {
 
     private renderResourceSelector(): void {
         let resourceSelectorElement = document.getElementById('resourceSelector') as HTMLElement;
-        http.get<ResourceSchema>(`GetContent/${this.selectedServiceId}/${this.selectedVersion}`).then((_) => {
+        http.get<ResourceSchema>(`${config.GetContentUrl}/${this.selectedServiceId}/${this.selectedVersion}`).then((_) => {
             this.selectedService = _;
             let resources: Array<Object> = [];
             for (let resource in _.resourceDefinitions) {
