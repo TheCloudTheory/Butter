@@ -81,4 +81,4 @@ stages:
               azureSubscription: 'MVP Sponsorship(58ac7037-efcc-4fb6-800d-da6ca2ee6aed)'
               appType: 'webApp'
               WebAppName: 'butter-prod-euw-functionapp'
-              packageForLinux: '$(Pipeline.Workspace)/backend/Butter.Backend'
+              packageForLinux: '$(Pipeline.Workspace)/backend'
