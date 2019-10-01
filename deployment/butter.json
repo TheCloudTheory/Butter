@@ -1,16 +1,114 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
-    "variables": {},
+    "parameters": {
+        "functionAppServiceName": {
+            "type": "string"
+        },
+        "functionAppName": {
+            "type": "string"
+        },
+        "functionStorageName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "functionStorageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', parameters('functionStorageName'))]",
+    },
     "resources": [
         {
-            "name": "butter-prod-euw-functionapp",
-            "location": "West Europe",
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "properties": {}
+            "name": "[parameters('functionAppServiceName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-02-01",
+            "dependsOn": [
+            ],
+            "tags": {
+                "displayName": "appservice"
+            },
+            "properties": {
+                "name": "[parameters('functionAppServiceName')]",
+                "computeMode": "Dynamic",
+                "sku": "Dynamic",
+                "workerSize": "0",
+                "numberOfWorkers": 1
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "kind": "functionapp",
+            "name": "[parameters('functionAppName')]",
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "functionapp"
+            },
+            "properties": {
+                "name": "[parameters('functionAppName')]",
+                "hostNames": [
+                    "[concat(parameters('functionAppName'),'.azurewebsites.net')]"
+                ],
+                "cors": {
+                    "allowedOrigins": [
+                        "[concat('https://', parameters('functionAppName'), '.azurewebsites.net')]",
+                    ]
+                },
+                "enabledHostNames": [
+                    "[concat(parameters('functionAppName'), '.azurewebsites.net')]",
+                    "[concat(parameters('functionAppName'), '.scm.azurewebsites.net')]"
+                ],
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('functionAppName'),'.azurewebsites.net')]",
+                        "sslState": 0,
+                        "thumbprint": null,
+                        "ipBasedSslState": 0
+                    },
+                    {
+                        "name": "[concat(parameters('functionAppName'),'.scm.azurewebsites.net')]",
+                        "sslState": 0,
+                        "thumbprint": null,
+                        "ipBasedSslState": 0
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('functionAppServiceName'))]"
+            },
+            "resources": [
+                {
+                    "name": "appsettings",
+                    "type": "config",
+                    "apiVersion": "2015-08-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "functionappsettings"
+                    },
+                    "properties": {
+                        "AzureWebJobsStorage": "[Concat('DefaultEndpointsProtocol=https;AccountName=',parameters('functionStorageName'),';AccountKey=',listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]",
+                    }
+                }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('functionAppServiceName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageName'))]",
+            ]
+        },
+        {
+            "name": "[parameters('functionStorageName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [
+            ],
+            "tags": {
+                "displayName": "functionstorage"
+            },
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
         }
     ],
-    "outputs": {} 
+    "outputs": {
+    }
 }
