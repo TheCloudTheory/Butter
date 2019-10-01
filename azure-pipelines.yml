@@ -37,13 +37,21 @@ stages:
           projects: 'Butter.Backend/Butter.Backend.csproj'
           publishWebProjects: false  
           arguments: '--output $(Build.ArtifactStagingDirectory)/Backend'
+          configuration: 'Release'
+          modifyOutputPath: true
+          zipAfterPublish: false
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: "$(System.ArtifactStagingDirectory)/Backend"
+          includeRootFolder: false
+          archiveFile: "$(System.ArtifactStagingDirectory)/build$(Build.BuildId).zip"
       - task: PublishPipelineArtifact@1
         inputs:
           targetPath: 'deployment'
           artifact: 'deployment'
       - task: PublishPipelineArtifact@1
         inputs:
-          targetPath: '$(Build.ArtifactStagingDirectory)/Backend'
+          targetPath: '$(System.ArtifactStagingDirectory)/build$(Build.BuildId).zip'
           artifact: 'backend'
 - stage: PublishAzure
   jobs:
