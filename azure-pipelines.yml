@@ -80,8 +80,9 @@ stages:
               resourceGroupName: 'butter-prod-euw-rg'
               location: 'West Europe'
               templateLocation: 'Linked artifact'
-              csmParametersFile: '$(Pipeline.Workspace)/deployment/butter.parameters.json'
               csmFile: '$(Pipeline.Workspace)/deployment/butter.json'
+              csmParametersFile: '$(Pipeline.Workspace)/deployment/butter.parameters.json'
+              overrideParameters: '-clientId $(Client_Id) -clientSecret $(Client_Secret)'
               deploymentMode: 'Incremental'
           - task: AzureFunctionApp@1
             inputs:
