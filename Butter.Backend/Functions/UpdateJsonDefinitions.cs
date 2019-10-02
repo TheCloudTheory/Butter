@@ -13,7 +13,7 @@ namespace Butter.Backend
     {
         [FunctionName("UpdateJsonDefinitions")]
         public static async Task Run(
-            [TimerTrigger("0 */1 * * * *")] TimerInfo myTimer,
+            [TimerTrigger("0 */60 * * * *")] TimerInfo myTimer,
             [Blob("schemas")] CloudBlobContainer container,
             ILogger log)
         {
