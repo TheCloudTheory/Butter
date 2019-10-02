@@ -42,7 +42,7 @@ stages:
           zipAfterPublish: false
       - task: ArchiveFiles@2
         inputs:
-          rootFolderOrFile: "$(Build.ArtifactStagingDirectory)/Backend"
+          rootFolderOrFile: "$(Build.ArtifactStagingDirectory)/Backend/Butter.Backend"
           includeRootFolder: false
           archiveFile: "$(Build.ArtifactStagingDirectory)/build$(Build.BuildId).zip"
       - task: PublishPipelineArtifact@1
