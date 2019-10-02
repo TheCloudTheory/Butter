@@ -10,6 +10,12 @@
       },
       "functionStorageName": {
         "value": "butterprodeuwstorage"
+      },
+      "clientId": {
+        "value": ""
+      },
+      "clientSecret": {
+        "value": ""
       }
     }
   }

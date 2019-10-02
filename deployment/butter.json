@@ -10,6 +10,12 @@
         },
         "functionStorageName": {
             "type": "string"
+        },
+        "clientId": {
+            "type": "string"
+        },
+        "clientSecret": {
+            "type": "securestring"
         }
     },
     "variables": {
@@ -58,7 +64,9 @@
                         "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[Concat('DefaultEndpointsProtocol=https;AccountName=',parameters('functionStorageName'),';AccountKey=',listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]",
                         "WEBSITE_CONTENTSHARE": "[toLower(parameters('functionAppName'))]",
                         "FUNCTIONS_EXTENSION_VERSION": "~2",
-                        "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+                        "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+                        "CLIENT_ID": "[parameters('clientId')]",
+                        "CLIENT_SECRET": "[parameters('clientSecret')]"
                     }
                 }
             ],
