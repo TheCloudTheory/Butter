@@ -29,8 +29,8 @@
                                     {{^isBoolean}}
                                         {{#isDynamic}}
                                             <div class="input-group">
-                                                <input class="form-input input-sm" type="text" placeholder="key" name="{{name}}.key">
-                                                <input class="form-input input-sm" type="text" placeholder="value" name="{{name}}.value">
+                                                <input class="form-input" type="text" placeholder="key" name="{{name}}.key">
+                                                <input class="form-input" type="text" placeholder="value" name="{{name}}.value">
                                                 <button class="btn btn-primary input-group-btn" type="button">Add new</button>
                                             </div>
                                         {{/isDynamic}}

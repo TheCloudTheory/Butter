@@ -154,7 +154,6 @@ class butter {
     private renderJsonSchema(): void {
         let schemaElement = document.getElementById('content') as HTMLElement;
         let schema = this.selectedService as ResourceSchema;
-        console.log(schema);
         let selectedResource = schema.resourceDefinitions[this.selectedResource];
         let fields = this.flattenFields(selectedResource, selectedResource.required);
         let outputFields: PropertyDescription[] = [];
@@ -197,7 +196,7 @@ class butter {
                     isDynamic: true
                 });
 
-                return;
+                continue;
             }
 
             if (propertyDefinition.type) {
@@ -288,7 +287,11 @@ class butter {
                     json[complexKey[0]] = this.digDeeper(complexKey, 1, {}, value);
                 }
                 else {
-                    (<any>json[complexKey[0]])[complexKey[1]] = this.digDeeper(complexKey, 2, {}, value);
+                    if(typeof ((<any>json[complexKey[0]])[complexKey[1]]) === 'undefined') {
+                        (<any>json[complexKey[0]])[complexKey[1]] = this.digDeeper(complexKey, 2, {}, value);
+                    } else {
+                        ((<any>json[complexKey[0]])[complexKey[1]])[complexKey[2]] = this.digDeeper(complexKey, 3, {}, value);
+                    }
                 }
             }
             else {
