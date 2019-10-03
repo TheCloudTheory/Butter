@@ -61,7 +61,7 @@ class butter {
     private renderSearchBoxSuggestions(searchBox: HTMLInputElement, model: Array<string>): void {
         let suggestionsElement = document.getElementById('searchBoxSuggestions') as HTMLElement;
         templates.renderTemplate('searchBoxSuggestions', suggestionsElement, { services: model }).then(() => {
-            this.alterActive('searchBoxSuggestions');
+            this.alterActive('searchBoxSuggestions', false);
             let suggestionItems = document.getElementsByClassName('suggestion-item');
             for (let i = 0; i < suggestionItems.length; i++) {
                 suggestionItems[i].addEventListener('click', (e) => {
