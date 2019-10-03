@@ -154,6 +154,7 @@ class butter {
     private renderJsonSchema(): void {
         let schemaElement = document.getElementById('content') as HTMLElement;
         let schema = this.selectedService as ResourceSchema;
+        console.log(schema);
         let selectedResource = schema.resourceDefinitions[this.selectedResource];
         let fields = this.flattenFields(selectedResource, selectedResource.required);
         let outputFields: PropertyDescription[] = [];
@@ -188,20 +189,33 @@ class butter {
             let name = parentProperty ? `${parentProperty}.${property}` : property;
             let isRequired = typeof(requiredFields) !== 'undefined' ? requiredFields.includes(property) : false;
 
+            if(name === 'tags') {
+                result.push({
+                    name: name,
+                    isObject: true,
+                    isRequired,
+                    isDynamic: true
+                });
+
+                return;
+            }
+
             if (propertyDefinition.type) {
                 if (propertyDefinition.enum) {
                     result.push({
                         isEnum: true,
                         name: name,
                         possibleValues: propertyDefinition.enum,
-                        isRequired
+                        isRequired,
+                        isDynamic: false
                     });
                 }
                 else {
                     result.push({
                         name: name,
                         description: propertyDefinition.description,
-                        isRequired
+                        isRequired,
+                        isDynamic: false
                     });
                 }
             }
@@ -222,7 +236,8 @@ class butter {
                         isEnum: true,
                         name: name,
                         possibleValues: oneOfDescription.enum,
-                        isRequired
+                        isRequired,
+                        isDynamic: false
                     })
                 }
                 else {
@@ -231,7 +246,8 @@ class butter {
                             result.push({
                                 name: name,
                                 isObject: true,
-                                isRequired
+                                isRequired,
+                                isDynamic: false
                             });
                         }
 
@@ -239,7 +255,8 @@ class butter {
                             result.push({
                                 name: name,
                                 isBoolean: true,
-                                isRequired
+                                isRequired,
+                                isDynamic: false
                             });
                         }
                     }

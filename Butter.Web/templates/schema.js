@@ -27,7 +27,16 @@
                                         </label>
                                     {{/isBoolean}}
                                     {{^isBoolean}}
-                                        <input class="form-input schema-field" type="text" placeholder="{{description}}" name="{{name}}">
+                                        {{#isDynamic}}
+                                            <div class="input-group">
+                                                <input class="form-input input-sm" type="text" placeholder="key" name="{{name}}.key">
+                                                <input class="form-input input-sm" type="text" placeholder="value" name="{{name}}.value">
+                                                <button class="btn btn-primary input-group-btn" type="button">Add new</button>
+                                            </div>
+                                        {{/isDynamic}}
+                                        {{^isDynamic}}
+                                            <input class="form-input schema-field" type="text" placeholder="{{description}}" name="{{name}}">
+                                        {{/isDynamic}}
                                     {{/isBoolean}}
                                 {{/isEnum}}
                             </div>

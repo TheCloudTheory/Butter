@@ -39,6 +39,7 @@ export type PropertyDescription = {
     isBoolean?: boolean;
     isObject?: boolean;
     isRequired: boolean;
+    isDynamic: boolean
 }
 
 export type OneOf = {
