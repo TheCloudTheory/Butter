@@ -172,8 +172,6 @@ class butter {
             this.addEventListenersToSchemaFields();
             this.renderGeneratedJson();
         });
-
-        console.log(schema);
     }
 
     private flattenFields(definition: ResourceDefinition, requiredFields: string[]): PropertyDescription[] {
@@ -189,7 +187,6 @@ class butter {
             let propertyDefinition = properties[property];
             let name = parentProperty ? `${parentProperty}.${property}` : property;
             let isRequired = typeof(requiredFields) !== 'undefined' ? requiredFields.includes(property) : false;
-            console.log(isRequired, name);
 
             if (propertyDefinition.type) {
                 if (propertyDefinition.enum) {

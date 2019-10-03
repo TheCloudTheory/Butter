@@ -22,7 +22,7 @@
                                 {{^isEnum}}
                                     {{#isBoolean}}
                                         <label class="form-switch">
-                                            <input type="checkbox" name="{{name}}" class="schema-field">
+                                            <input type="checkbox" name="{{name}}" class="schema-field" value="true">
                                             <i class="form-icon"></i> Enabled
                                         </label>
                                     {{/isBoolean}}
