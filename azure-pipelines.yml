@@ -25,6 +25,7 @@ stages:
             dist/*.js
             style/*.css
             index.html
+            templates/*.mst
           TargetFolder: 'Web'
           CleanTargetFolder: true
       - task: PublishPipelineArtifact@1
