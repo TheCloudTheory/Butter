@@ -342,7 +342,7 @@ const http_1 = __importDefault(require("./http"));
 const mustache_1 = __importDefault(require("mustache"));
 class templates {
     static renderTemplate(name, wrapper, model) {
-        return http_1.default.getLocal(`templates/${name}.mst`).then(_ => {
+        return http_1.default.getLocal(`templates/${name}.js`).then(_ => {
             let rendered = mustache_1.default.render(_, model);
             wrapper.innerHTML = rendered;
         });
