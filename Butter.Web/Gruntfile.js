@@ -75,8 +75,8 @@ module.exports = function (grunt) {
                             replacement: '<%= process.env.GET_MAP_URL %>'
                         },
                         {
-                            match: 'GET_MAP_URL',
-                            replacement: '<%= process.env.GET_MAP_URL %>'
+                            match: 'GET_MAP_KEY',
+                            replacement: '<%= process.env.GET_MAP_KEY %>'
                         },
                     ]
                 },
