@@ -51,7 +51,7 @@ class butter {
     renderSearchBoxSuggestions(searchBox, model) {
         let suggestionsElement = document.getElementById('searchBoxSuggestions');
         templates_1.default.renderTemplate('searchBoxSuggestions', suggestionsElement, { services: model }).then(() => {
-            this.alterActive('searchBoxSuggestions');
+            this.alterActive('searchBoxSuggestions', false);
             let suggestionItems = document.getElementsByClassName('suggestion-item');
             for (let i = 0; i < suggestionItems.length; i++) {
                 suggestionItems[i].addEventListener('click', (e) => {
@@ -114,18 +114,20 @@ class butter {
         buttonElement.addEventListener('click', () => {
             this.renderJsonSchemaTemplate();
         });
-        this.alterActive('getContentButton');
+        this.alterActive('getContentButton', false);
     }
     renderJsonSchemaTemplate() {
         this.renderJsonSchema();
     }
-    alterActive(elementId) {
-        let suggestionsBox = document.getElementById(elementId);
-        if (suggestionsBox.classList.contains('active')) {
-            suggestionsBox.classList.remove('active');
+    alterActive(elementId, removeClass = true) {
+        let element = document.getElementById(elementId);
+        if (element.classList.contains('active')) {
+            if (removeClass === true) {
+                element.classList.remove('active');
+            }
             return;
         }
-        suggestionsBox.classList.add('active');
+        element.classList.add('active');
     }
     renderJsonSchema() {
         let schemaElement = document.getElementById('content');
@@ -146,7 +148,6 @@ class butter {
             this.addEventListenersToSchemaFields();
             this.renderGeneratedJson();
         });
-        console.log(schema);
     }
     flattenFields(definition, requiredFields) {
         let properties = [];
@@ -159,21 +160,31 @@ class butter {
             let propertyDefinition = properties[property];
             let name = parentProperty ? `${parentProperty}.${property}` : property;
             let isRequired = typeof (requiredFields) !== 'undefined' ? requiredFields.includes(property) : false;
-            console.log(isRequired, name);
+            if (name === 'tags') {
+                result.push({
+                    name: name,
+                    isObject: true,
+                    isRequired,
+                    isDynamic: true
+                });
+                continue;
+            }
             if (propertyDefinition.type) {
                 if (propertyDefinition.enum) {
                     result.push({
                         isEnum: true,
                         name: name,
                         possibleValues: propertyDefinition.enum,
-                        isRequired
+                        isRequired,
+                        isDynamic: false
                     });
                 }
                 else {
                     result.push({
                         name: name,
                         description: propertyDefinition.description,
-                        isRequired
+                        isRequired,
+                        isDynamic: false
                     });
                 }
             }
@@ -192,7 +203,8 @@ class butter {
                         isEnum: true,
                         name: name,
                         possibleValues: oneOfDescription.enum,
-                        isRequired
+                        isRequired,
+                        isDynamic: false
                     });
                 }
                 else {
@@ -201,14 +213,16 @@ class butter {
                             result.push({
                                 name: name,
                                 isObject: true,
-                                isRequired
+                                isRequired,
+                                isDynamic: false
                             });
                         }
                         if (oneOfDescription.type === 'boolean') {
                             result.push({
                                 name: name,
                                 isBoolean: true,
-                                isRequired
+                                isRequired,
+                                isDynamic: false
                             });
                         }
                     }
@@ -237,7 +251,12 @@ class butter {
                     json[complexKey[0]] = this.digDeeper(complexKey, 1, {}, value);
                 }
                 else {
-                    json[complexKey[0]][complexKey[1]] = this.digDeeper(complexKey, 2, {}, value);
+                    if (typeof (json[complexKey[0]][complexKey[1]]) === 'undefined') {
+                        json[complexKey[0]][complexKey[1]] = this.digDeeper(complexKey, 2, {}, value);
+                    }
+                    else {
+                        (json[complexKey[0]][complexKey[1]])[complexKey[2]] = this.digDeeper(complexKey, 3, {}, value);
+                    }
                 }
             }
             else {
@@ -402,7 +421,7 @@ exports.default = templates;
    * Safe way of detecting whether or not the given thing is a primitive and
    * whether it has the given property
    */
-  function primitiveHasOwnProperty (primitive, propName) {  
+  function primitiveHasOwnProperty (primitive, propName) {
     return (
       primitive != null
       && typeof primitive !== 'object'
@@ -467,16 +486,22 @@ exports.default = templates;
    * Tokens that are the root node of a subtree contain two more elements: 1) an
    * array of tokens in the subtree and 2) the index in the original template at
    * which the closing tag for that section begins.
+   *
+   * Tokens for partials also contain two more elements: 1) a string value of
+   * indendation prior to that tag and 2) the index of that tag on that line -
+   * eg a value of 2 indicates the partial is the third tag on this line.
    */
   function parseTemplate (template, tags) {
     if (!template)
       return [];
-
+    var lineHasNonSpace = false;
     var sections = [];     // Stack to hold section tokens
     var tokens = [];       // Buffer to hold the tokens
     var spaces = [];       // Indices of whitespace tokens on the current line
     var hasTag = false;    // Is there a {{tag}} on the current line?
     var nonSpace = false;  // Is there a non-space char on the current line?
+    var indentation = '';  // Tracks indentation for tags that use it
+    var tagIndex = 0;      // Stores a count of number of tags encountered on a line
 
     // Strips all whitespace tokens array for the current line
     // if there was a {{#tag}} on it and otherwise only space.
@@ -522,16 +547,23 @@ exports.default = templates;
 
           if (isWhitespace(chr)) {
             spaces.push(tokens.length);
+            indentation += chr;
           } else {
             nonSpace = true;
+            lineHasNonSpace = true;
+            indentation += ' ';
           }
 
           tokens.push([ 'text', chr, start, start + 1 ]);
           start += 1;
 
           // Check for whitespace on the current line.
-          if (chr === '\n')
+          if (chr === '\n') {
             stripSpace();
+            indentation = '';
+            tagIndex = 0;
+            lineHasNonSpace = false;
+          }
         }
       }
 
@@ -563,7 +595,12 @@ exports.default = templates;
       if (!scanner.scan(closingTagRe))
         throw new Error('Unclosed tag at ' + scanner.pos);
 
-      token = [ type, value, start, scanner.pos ];
+      if (type == '>') {
+        token = [ type, value, start, scanner.pos, indentation, tagIndex, lineHasNonSpace ];
+      } else {
+        token = [ type, value, start, scanner.pos ];
+      }
+      tagIndex++;
       tokens.push(token);
 
       if (type === '#' || type === '^') {
@@ -584,6 +621,8 @@ exports.default = templates;
         compileTags(value);
       }
     }
+
+    stripSpace();
 
     // Make sure there are no open sections when we're done.
     openSection = sections.pop();
@@ -771,7 +810,7 @@ exports.default = templates;
           while (intermediateValue != null && index < names.length) {
             if (index === names.length - 1)
               lookupHit = (
-                hasProperty(intermediateValue, names[index]) 
+                hasProperty(intermediateValue, names[index])
                 || primitiveHasOwnProperty(intermediateValue, names[index])
               );
 
@@ -945,12 +984,31 @@ exports.default = templates;
       return this.renderTokens(token[4], context, partials, originalTemplate);
   };
 
+  Writer.prototype.indentPartial = function indentPartial (partial, indentation, lineHasNonSpace) {
+    var filteredIndentation = indentation.replace(/[^ \t]/g, '');
+    var partialByNl = partial.split('\n');
+    for (var i = 0; i < partialByNl.length; i++) {
+      if (partialByNl[i].length && (i > 0 || !lineHasNonSpace)) {
+        partialByNl[i] = filteredIndentation + partialByNl[i];
+      }
+    }
+    return partialByNl.join('\n');
+  };
+
   Writer.prototype.renderPartial = function renderPartial (token, context, partials, tags) {
     if (!partials) return;
 
     var value = isFunction(partials) ? partials(token[1]) : partials[token[1]];
-    if (value != null)
-      return this.renderTokens(this.parse(value, tags), context, partials, value);
+    if (value != null) {
+      var lineHasNonSpace = token[6];
+      var tagIndex = token[5];
+      var indentation = token[4];
+      var indentedValue = value;
+      if (tagIndex == 0 && indentation) {
+        indentedValue = this.indentPartial(value, indentation, lineHasNonSpace);
+      }
+      return this.renderTokens(this.parse(indentedValue, tags), context, partials, indentedValue);
+    }
   };
 
   Writer.prototype.unescapedValue = function unescapedValue (token, context) {
@@ -970,7 +1028,7 @@ exports.default = templates;
   };
 
   mustache.name = 'mustache.js';
-  mustache.version = '3.0.1';
+  mustache.version = '3.1.0';
   mustache.tags = [ '{{', '}}' ];
 
   // All high-level mustache.* functions use this writer.
