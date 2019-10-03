@@ -46,3 +46,7 @@
 .off-canvas .off-canvas-content {
     padding-left: 1rem;
 }
+
+#sidebar-id {
+    overflow: visible;
+}
