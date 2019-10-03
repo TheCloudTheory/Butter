@@ -23,7 +23,7 @@ class butter {
     }
 
     initialize(): void {
-        http.get<{ [id: string]: Array<string> }>(config.GetMapUrl).then(_ => {
+        http.get<{ [id: string]: Array<string> }>(config.GetMapUrl, config.GetMapKey).then(_ => {
             this.map = _;
             templates.renderTemplate('welcome', this.sidebar as HTMLElement, {}).then(() => {
                 this.registerSearchBoxEventListener();
@@ -97,7 +97,7 @@ class butter {
 
     private renderResourceSelector(): void {
         let resourceSelectorElement = document.getElementById('resourceSelector') as HTMLElement;
-        http.get<ResourceSchema>(`${config.GetContentUrl}/${this.selectedServiceId}/${this.selectedVersion}`).then((_) => {
+        http.get<ResourceSchema>(`${config.GetContentUrl}/${this.selectedServiceId}/${this.selectedVersion}`, config.GetContentKey).then((_) => {
             this.selectedService = _;
             let resources: Array<Object> = [];
             for (let resource in _.resourceDefinitions) {

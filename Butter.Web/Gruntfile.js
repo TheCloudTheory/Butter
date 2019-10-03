@@ -47,11 +47,15 @@ module.exports = function (grunt) {
         env: {
             local: {
                 GET_CONTENT_URL: 'http://localhost:7071/api/GetContent',
-                GET_MAP_URL: 'http://localhost:7071/api/GetMap'
+                GET_CONTENT_KEY: '',
+                GET_MAP_URL: 'http://localhost:7071/api/GetMap',
+                GET_MAP_KEY: ''
             },
             prod: {
                 GET_CONTENT_URL: 'https://butter-prod-euw-functionapp.azurewebsites.net/api/GetContent',
-                GET_MAP_URL: 'https://butter-prod-euw-functionapp.azurewebsites.net/api/GetMap'
+                GET_CONTENT_KEY: 'H7lZjbEzw4Uhzc0d4HjaxwSRP46/oWMMKr8NljsWqoTp6Q03a5hIYw==',
+                GET_MAP_URL: 'https://butter-prod-euw-functionapp.azurewebsites.net/api/GetMap',
+                GET_MAP_KEY: 'oQ0eFJ8snS4jldja7k1YyjBH09cuKrY3p5LBa4awhD/Wve22blAywg=='
             }
         },
         replace: {
@@ -63,9 +67,17 @@ module.exports = function (grunt) {
                             replacement: '<%= process.env.GET_CONTENT_URL %>'
                         },
                         {
+                            match: 'GET_CONTENT_KEY',
+                            replacement: '<%= process.env.GET_CONTENT_KEY %>'
+                        },
+                        {
                             match: 'GET_MAP_URL',
                             replacement: '<%= process.env.GET_MAP_URL %>'
-                        }
+                        },
+                        {
+                            match: 'GET_MAP_URL',
+                            replacement: '<%= process.env.GET_MAP_URL %>'
+                        },
                     ]
                 },
                 files: [
