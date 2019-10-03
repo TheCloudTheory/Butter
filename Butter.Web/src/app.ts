@@ -131,21 +131,24 @@ class butter {
             this.renderJsonSchemaTemplate();
         });
 
-        this.alterActive('getContentButton');
+        this.alterActive('getContentButton', false);
     }
 
     private renderJsonSchemaTemplate(): void {
         this.renderJsonSchema();
     }
 
-    private alterActive(elementId: string): void {
-        let suggestionsBox = document.getElementById(elementId) as HTMLElement;
-        if (suggestionsBox.classList.contains('active')) {
-            suggestionsBox.classList.remove('active');
+    private alterActive(elementId: string, removeClass: boolean = true): void {
+        let element = document.getElementById(elementId) as HTMLElement;
+        if (element.classList.contains('active')) {
+            if(removeClass === true) {
+                element.classList.remove('active');
+            }
+            
             return;
         }
 
-        suggestionsBox.classList.add('active');
+        element.classList.add('active');
     }
 
     private renderJsonSchema(): void {
