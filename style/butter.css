@@ -50,3 +50,12 @@
 #sidebar-id {
     overflow: visible;
 }
+
+#sidebar.columns {
+    margin-right: 0;
+}
+
+.github-corner {
+    position: absolute;
+    z-index: 100000;
+}
