@@ -16,6 +16,7 @@ class butter {
         this.selectedResource = '';
         this.selectedService = null;
         this.optionalFieldsEnabled = false;
+        this.fullTemplateSchemaEnabled = false;
     }
     initialize() {
         http_1.default.get(config_1.default.GetMapUrl, config_1.default.GetMapKey).then(_ => {
@@ -23,6 +24,7 @@ class butter {
             templates_1.default.renderTemplate('welcome', this.sidebar, {}).then(() => {
                 this.registerSearchBoxEventListener();
                 this.registerOptionalFieldsListener();
+                this.registerFullSchemaListener();
             });
         });
     }
@@ -30,6 +32,15 @@ class butter {
         let input = document.getElementById('optionalFieldsToggle');
         input.addEventListener('change', () => {
             this.optionalFieldsEnabled = !this.optionalFieldsEnabled;
+            if (this.selectedServiceId !== '' && this.selectedVersion !== '') {
+                this.renderJsonSchemaTemplate();
+            }
+        });
+    }
+    registerFullSchemaListener() {
+        let input = document.getElementById('fullTemplateSchemaToggle');
+        input.addEventListener('change', () => {
+            this.fullTemplateSchemaEnabled = !this.fullTemplateSchemaEnabled;
             if (this.selectedServiceId !== '' && this.selectedVersion !== '') {
                 this.renderJsonSchemaTemplate();
             }
@@ -263,7 +274,18 @@ class butter {
                 json[key] = value.toString();
             }
         });
-        templates_1.default.renderTemplate('json', jsonElement, { json: JSON.stringify(json, null, "\t") });
+        if (this.fullTemplateSchemaEnabled === true) {
+            let templateSchema = {
+                $schema: "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                contentVersion: "1.0.0.0",
+                resources: []
+            };
+            templateSchema.resources.push(json);
+            templates_1.default.renderTemplate('json', jsonElement, { json: JSON.stringify(templateSchema, null, "\t") });
+        }
+        else {
+            templates_1.default.renderTemplate('json', jsonElement, { json: JSON.stringify(json, null, "\t") });
+        }
     }
     digDeeper(keys, index, json, value) {
         let currentKey = keys[index];
@@ -291,7 +313,7 @@ class butter {
 let app = new butter();
 app.initialize();
 
-},{"./config":2,"./http":3,"./templates":5}],2:[function(require,module,exports){
+},{"./config":2,"./http":3,"./templates":6}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class config {
@@ -353,6 +375,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],5:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],6:[function(require,module,exports){
+"use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -369,7 +395,7 @@ class templates {
 }
 exports.default = templates;
 
-},{"./http":3,"mustache":6}],6:[function(require,module,exports){
+},{"./http":3,"mustache":7}],7:[function(require,module,exports){
 /*!
  * mustache.js - Logic-less {{mustache}} templates with JavaScript
  * http://github.com/janl/mustache.js
@@ -1092,4 +1118,4 @@ exports.default = templates;
   return mustache;
 }));
 
-},{}]},{},[1,2,3,4,5]);
+},{}]},{},[1,2,3,4,6,5]);

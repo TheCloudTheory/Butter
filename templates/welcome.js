@@ -38,6 +38,10 @@
                 <input type="checkbox" id="optionalFieldsToggle">
                 <i class="form-icon"></i> Enable optional fields
             </label>
+            <label class="form-switch text-left">
+                <input type="checkbox" id="fullTemplateSchemaToggle">
+                <i class="form-icon"></i> Enable full schema
+            </label>
             </div>
         </div>
      </div>

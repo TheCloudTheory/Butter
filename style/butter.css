@@ -59,3 +59,7 @@
     position: absolute;
     z-index: 100000;
 }
+
+pre {
+    white-space: pre-wrap;
+}
