@@ -2,6 +2,7 @@ import http from './http';
 import templates from './templates';
 import { ResourceSchema, Property, ResourceDefinition, PropertyDescription } from './resourceSchema';
 import config from './config';
+import { TemplateSchema } from './templateSchema';
 
 class butter {
     sidebar: HTMLElement | null;
@@ -11,6 +12,7 @@ class butter {
     selectedVersion: string;
     selectedResource: string;
     optionalFieldsEnabled: boolean;
+    fullTemplateSchemaEnabled: boolean;
 
     constructor() {
         this.sidebar = document.getElementById('sidebar');
@@ -20,6 +22,7 @@ class butter {
         this.selectedResource = '';
         this.selectedService = null;
         this.optionalFieldsEnabled = false;
+        this.fullTemplateSchemaEnabled = false;
     }
 
     initialize(): void {
@@ -28,6 +31,7 @@ class butter {
             templates.renderTemplate('welcome', this.sidebar as HTMLElement, {}).then(() => {
                 this.registerSearchBoxEventListener();
                 this.registerOptionalFieldsListener();
+                this.registerFullSchemaListener();
             });
         });
     }
@@ -36,6 +40,16 @@ class butter {
         let input = document.getElementById('optionalFieldsToggle') as HTMLInputElement;
         input.addEventListener('change', () => {
             this.optionalFieldsEnabled = !this.optionalFieldsEnabled;
+            if (this.selectedServiceId !== '' && this.selectedVersion !== '') {
+                this.renderJsonSchemaTemplate();
+            }
+        });
+    }
+
+    private registerFullSchemaListener(): void {
+        let input = document.getElementById('fullTemplateSchemaToggle') as HTMLInputElement;
+        input.addEventListener('change', () => {
+            this.fullTemplateSchemaEnabled = !this.fullTemplateSchemaEnabled;
             if (this.selectedServiceId !== '' && this.selectedVersion !== '') {
                 this.renderJsonSchemaTemplate();
             }
@@ -126,7 +140,7 @@ class butter {
 
     private renderGetTemplateButton(): void {
         let buttonElement = document.getElementById('getContentButton') as HTMLElement;
-        buttonElement.removeEventListener('click', () => {});
+        buttonElement.removeEventListener('click', () => { });
         buttonElement.addEventListener('click', () => {
             this.renderJsonSchemaTemplate();
         });
@@ -141,10 +155,10 @@ class butter {
     private alterActive(elementId: string, removeClass: boolean = true): void {
         let element = document.getElementById(elementId) as HTMLElement;
         if (element.classList.contains('active')) {
-            if(removeClass === true) {
+            if (removeClass === true) {
                 element.classList.remove('active');
             }
-            
+
             return;
         }
 
@@ -159,7 +173,7 @@ class butter {
         let outputFields: PropertyDescription[] = [];
 
         fields.forEach((value: PropertyDescription, index: Number) => {
-            if(value.isRequired || this.optionalFieldsEnabled) {
+            if (value.isRequired || this.optionalFieldsEnabled) {
                 outputFields.push(value);
             }
         });
@@ -186,9 +200,9 @@ class butter {
         for (let property in properties) {
             let propertyDefinition = properties[property];
             let name = parentProperty ? `${parentProperty}.${property}` : property;
-            let isRequired = typeof(requiredFields) !== 'undefined' ? requiredFields.includes(property) : false;
+            let isRequired = typeof (requiredFields) !== 'undefined' ? requiredFields.includes(property) : false;
 
-            if(name === 'tags') {
+            if (name === 'tags') {
                 result.push({
                     name: name,
                     isObject: true,
@@ -224,7 +238,7 @@ class butter {
                 if (oneOfDescription.$ref) {
                     let additionalDefinitionName = oneOfDescription.$ref.split('/')[2];
                     let additionalDefinition = schema.definitions[additionalDefinitionName];
-                    if(isRequired == false) {
+                    if (isRequired == false) {
                         additionalDefinition.required = [];
                     }
 
@@ -283,11 +297,11 @@ class butter {
         form.forEach((value: FormDataEntryValue, key: string, parent: FormData) => {
             let complexKey = key.split('.');
             if (complexKey.length > 1) {
-                if(typeof(json[complexKey[0]]) === 'undefined') {
+                if (typeof (json[complexKey[0]]) === 'undefined') {
                     json[complexKey[0]] = this.digDeeper(complexKey, 1, {}, value);
                 }
                 else {
-                    if(typeof ((<any>json[complexKey[0]])[complexKey[1]]) === 'undefined') {
+                    if (typeof ((<any>json[complexKey[0]])[complexKey[1]]) === 'undefined') {
                         (<any>json[complexKey[0]])[complexKey[1]] = this.digDeeper(complexKey, 2, {}, value);
                     } else {
                         ((<any>json[complexKey[0]])[complexKey[1]])[complexKey[2]] = this.digDeeper(complexKey, 3, {}, value);
@@ -299,14 +313,25 @@ class butter {
             }
         })
 
-        templates.renderTemplate('json', jsonElement, { json: JSON.stringify(json, null, "\t") });
+        if (this.fullTemplateSchemaEnabled === true) {
+            let templateSchema = {
+                $schema: "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                contentVersion: "1.0.0.0",
+                resources: []
+            } as TemplateSchema;
+
+            templateSchema.resources.push(json);
+            templates.renderTemplate('json', jsonElement, { json: JSON.stringify(templateSchema, null, "\t") });
+        } else {
+            templates.renderTemplate('json', jsonElement, { json: JSON.stringify(json, null, "\t") });
+        }
     }
 
-    private digDeeper(keys: string[], index: number, json: {[index: string] : Object}, value: FormDataEntryValue): Object {
+    private digDeeper(keys: string[], index: number, json: { [index: string]: Object }, value: FormDataEntryValue): Object {
         let currentKey = keys[index];
-        if(keys.length - 1 > index) {
+        if (keys.length - 1 > index) {
             index += 1;
-            if(typeof(json[currentKey]) === 'undefined') {
+            if (typeof (json[currentKey]) === 'undefined') {
                 json[currentKey] = this.digDeeper(keys, index, {}, value);
             }
             else {
@@ -315,7 +340,7 @@ class butter {
             }
         }
         else {
-            if(typeof(currentKey) == 'undefined') {
+            if (typeof (currentKey) == 'undefined') {
                 return value.toString();
             }
             else {
